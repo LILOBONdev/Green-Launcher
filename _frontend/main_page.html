@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="https://resources.download.minecraft.net/b6/b62ca8ec10d07e6bf5ac8dae0c8c1d2e6a1e3356" type="image/x-icon">
+    <style>
+        :root {
+            --bg-main: #0a0d0e; 
+            --sidebar-bg: #111517;
+            --accent-green: #30b536;
+            --accent-hover: #36d640;
+            --glass-surface: rgba(255, 255, 255, 0.02);
+            --border-color: rgba(255, 255, 255, 0.06);
+            --text-primary: #f0f2f4;
+            --text-secondary: #848d97;
+            --safe-margin: 40px; 
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            padding: var(--safe-margin);
+            position: relative;
+        }
+
+        .ambient-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            background: radial-gradient(circle at 50% 50%, #0d1a0e 0%, #0a0d0e 100%);
+            overflow: hidden;
+        }
+
+        .glow-blob {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(48, 181, 54, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: move-glow 30s infinite alternate ease-in-out;
+        }
+
+        .blob-1 { top: -20%; left: -10%; }
+        .blob-2 { bottom: -20%; right: -10%; animation-delay: -10s; }
+
+        @keyframes move-glow {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(150px, 100px) scale(1.2); }
+        }
+
+        .container {
+            width: 1000px;
+            height: 650px;
+            max-width: calc(100vw - (var(--safe-margin) * 2));
+            max-height: calc(100vh - (var(--safe-margin) * 2));
+            background: rgba(17, 21, 23, 0.8);
+            border-radius: 28px;
+            display: flex;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 50px 100px rgba(0,0,0,0.7);
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+            backdrop-filter: blur(40px);
+            transition: filter 0.4s ease;
+        }
+
+        .container.blurred { filter: blur(15px) brightness(0.6); pointer-events: none; }
+
+        .nav-sidebar {
+            width: 260px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-right: 1px solid var(--border-color);
+            background: rgba(15, 19, 21, 0.5);
+        }
+
+        .nav-card {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.2s ease-in-out;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .nav-card:hover { background: var(--glass-surface); color: var(--text-primary); transform: translateX(5px); }
+        .nav-card.active { background: rgba(48, 181, 54, 0.1); color: var(--accent-green); border: 1px solid rgba(48, 181, 54, 0.2); }
+
+        .content-area { flex: 1; padding: 45px; display: flex; flex-direction: column; }
+
+        .scroll-container { flex: 1; overflow-y: auto; padding: 10px 5px; margin-top: -10px; }
+        .scroll-container::-webkit-scrollbar { width: 4px; }
+        .scroll-container::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+        .profile-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .profile-item:hover { border-color: rgba(255, 255, 255, 0.12); transform: translateY(-2px); }
+        .profile-item.selected { background: rgba(48, 181, 54, 0.05); border-color: rgba(48, 181, 54, 0.4); }
+        .profile-item.empty { border: 1px dashed var(--border-color); background: transparent; justify-content: center; color: var(--text-secondary); }
+
+        .status-dot { width: 6px; height: 6px; background: #333; border-radius: 50%; transition: 0.3s; margin-left: 10px; }
+        .profile-item.selected .status-dot { background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); }
+
+        .delete-btn {
+            opacity: 0; padding: 8px; border-radius: 8px; color: #ff4d4d;
+            transition: 0.2s; margin-left: auto; display: flex; align-items: center;
+        }
+        .profile-item:hover .delete-btn { opacity: 0.6; }
+        .delete-btn:hover { opacity: 1 !important; background: rgba(255, 77, 77, 0.1); }
+
+        .actions-row { margin-top: 25px; display: flex; gap: 12px; justify-content: flex-end; align-items: center; }
+        .btn-console {
+            width: 48px; height: 48px; background: var(--glass-surface); border: 1px solid var(--border-color); border-radius: 12px;
+            cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .btn-console:hover { border-color: var(--accent-green); color: var(--accent-green); transform: scale(1.05); }
+
+        .btn-play {
+            height: 48px; padding: 0 45px; background: var(--accent-green); color: white; border: none; border-radius: 12px;
+            font-weight: 700; cursor: pointer; text-transform: uppercase; box-shadow: 0 8px 20px rgba(48, 181, 54, 0.2); transition: 0.3s;
+        }
+        .btn-play:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 12px 25px rgba(48, 181, 54, 0.4); }
+
+        #modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); display: none; align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal { background: #161b1d; width: 90%; max-width: 440px; padding: 35px; border-radius: 24px; border: 1px solid var(--border-color); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .modal input, .modal select { width: 100%; padding: 12px; background: #0d1112; border: 1px solid var(--border-color); border-radius: 10px; color: white; margin-top: 5px; outline: none; }
+        .modal input:focus, .modal select:focus { border-color: var(--accent-green); }
+
+    </style>
+</head>
+<body>
+
+    <div class="ambient-bg">
+        <div class="glow-blob blob-1"></div>
+        <div class="glow-blob blob-2"></div>
+    </div>
+
+    <div class="container" id="main-container">
+        <nav class="nav-sidebar">
+            <div style="font-weight: 900; font-size: 1.2rem; margin-bottom: 35px; padding-left: 10px; color: var(--accent-green);">Green Launcher</div>
+            <a class="nav-card active">Главная</a>
+            <a class="nav-card" onclick="alert('Потом добавлю')">Модпаки</a>
+            <a class="nav-card" onclick="alert('Потом добавлю')">Настройки</a>
+            <a class="nav-card" onclick="alert('Потом добавлю')">Корневая папка</a>
+        </nav>
+
+        <main class="content-area">
+            <header>
+                <h1 style="font-size: 2rem;">Профили</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 30px; font-size: 0.9rem;">2026 Edition • Выберите профиль</p>
+            </header>
+
+            <div class="scroll-container" id="profile-list">
+                <div class="profile-item empty" onclick="openModal()">
+                    <span>+ Создать новый профиль</span>
+                </div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-console">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                </button>
+                <button class="btn-play">Играть</button>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-overlay">
+        <div class="modal">
+            <h2 style="margin-bottom: 25px; text-align: center;">Новый профиль</h2>
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 0.8rem; color: var(--text-secondary);">Название</label>
+                <input type="text" id="nickname-input" placeholder="Напр: Survival 2026" maxlength="20">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 0.8rem; color: var(--text-secondary);">Версия</label>
+                <select id="version-select">
+                    <option>Загрузка версий...</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 12px; margin-top: 30px;">
+                <button onclick="closeModal()" style="flex:1; padding: 14px; background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 12px; cursor: pointer;">Отмена</button>
+                <button onclick="createProfile()" style="flex:2; padding: 14px; background: var(--accent-green); border: none; color: white; border-radius: 12px; font-weight: bold; cursor: pointer;">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const storageKey = 'mc_profiles_2026';
+        const selectKey = 'selected_profile_id';
+        const versionUrl = 'https://piston-meta.mojang.com/mc/game/version_manifest_v2.json';
+
+        function openModal() { 
+            document.getElementById('modal-overlay').style.display = 'flex'; 
+            document.getElementById('main-container').classList.add('blurred'); 
+        }
+        function closeModal() { 
+            document.getElementById('modal-overlay').style.display = 'none'; 
+            document.getElementById('main-container').classList.remove('blurred'); 
+        }
+        
+        function getProfiles() { return JSON.parse(localStorage.getItem(storageKey) || '[]'); }
+        function saveProfiles(p) { localStorage.setItem(storageKey, JSON.stringify(p)); renderProfiles(); }
+
+        async function fetchMojangVersions() {
+            const select = document.getElementById('version-select');
+            try {
+                const response = await fetch(versionUrl);
+                const data = await response.json();
+                const releases = data.versions.filter(v => v.type === 'release');
+                
+                select.innerHTML = '';
+                releases.forEach(v => {
+                    const option = document.createElement('option');
+                    option.value = v.id;
+                    option.textContent = v.id + (v.id === data.latest.release ? ' (Latest)' : '');
+                    select.appendChild(option);
+                });
+            } catch (e) {
+                select.innerHTML = '<option value="1.21.4">1.21.4 (Offline)</option><option value="1.20.1">1.20.1</option>';
+            }
+        }
+
+        function selectProfile(id) {
+            localStorage.setItem(selectKey, id);
+            renderProfiles();
+        }
+
+        function deleteProfile(id, event) {
+            event.stopPropagation();
+            let p = getProfiles();
+            p = p.filter(item => item.id !== id);
+            if (localStorage.getItem(selectKey) == id) localStorage.removeItem(selectKey);
+            saveProfiles(p);
+        }
+
+        function createProfile() {
+            const name = document.getElementById('nickname-input').value.trim();
+            const version = document.getElementById('version-select').value;
+            if(!name || version.includes('Загрузка')) return;
+            const p = getProfiles();
+            const newId = Date.now();
+            p.push({ name, version, id: newId });
+            saveProfiles(p);
+            selectProfile(newId);
+            closeModal();
+        }
+
+        function renderProfiles() {
+            const profiles = getProfiles();
+            const selectedId = localStorage.getItem(selectKey);
+            const list = document.getElementById('profile-list');
+            const emptyBtn = list.querySelector('.empty');
+            list.innerHTML = ''; list.appendChild(emptyBtn);
+
+            profiles.forEach(p => {
+                const isSelected = p.id == selectedId;
+                const item = document.createElement('div');
+                item.className = `profile-item ${isSelected ? 'selected' : ''}`;
+                item.onclick = () => selectProfile(p.id);
+                item.innerHTML = `
+                    <div style="width: 42px; height: 42px; background: #1a1e20; border-radius: 10px; margin-right: 18px; border: 1px solid var(--border-color); display:flex; align-items:center; justify-content:center;">
+                        <img src="https://resources.download.minecraft.net/b6/b62ca8ec10d07e6bf5ac8dae0c8c1d2e6a1e3356" style="width: 24px;">
+                    </div>
+                    <div style="flex:1">
+                        <div style="font-weight: 600; font-size: 0.95rem; color: #fff;">${p.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary);">${p.version} • Vanilla</div>
+                    </div>
+                    <div class="delete-btn" onclick="deleteProfile(${p.id}, event)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </div>
+                    <div class="status-dot"></div>`;
+                list.appendChild(item);
+            });
+        }
+        renderProfiles();
+        fetchMojangVersions();
+
+        document.querySelector('.btn-play').addEventListener('click', async () => {
+            const selectedId = localStorage.getItem(selectKey);
+            const profiles = getProfiles();
+            const activeProfile = profiles.find(p => p.id == selectedId);
+
+            if (activeProfile) {
+                document.querySelector(".btn-play").textContent = "Грузим..."
+                document.querySelector(".btn-play").disabled = true
+
+                await window.play_minecraft(`${activeProfile.version}`,`${activeProfile.name}`)
+                
+                document.querySelector(".btn-play").textContent = "Играть"
+                document.querySelector(".btn-play").disabled = false
+
+                await window.start_minecraft(`Launch\\Minecraft ${activeProfile.version} [${activeProfile.name}].bat`)
+
+
+            } else {
+                alert('Пожалуйста, выберите или создайте профиль.');
+            }
+        });
+
+        document.querySelector('.btn-console').addEventListener('click', async () => {
+            await window.open_console()
+        });
+    </script>
+</body>
+</html>
