@@ -16,6 +16,7 @@ func main() {
 	w.SetSize(800, 600, webview.HintNone)
 
 	w.SetTitle("Green Launcher")
+	// enter your full path to main_page.html
 	w.Navigate("C:/Users/NL/Desktop/Softs/minecraft_launcher_test/.frontend/main_page.html")
 
 	err := w.Bind("play_minecraft", func(minecraft_version string, player_name string) {
@@ -44,3 +45,4 @@ func main() {
 
 	w.Run()
 }
+
