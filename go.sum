@@ -1,0 +1,6 @@
+github.com/abemedia/go-webview v0.0.0-20250327021345-7b06ad397f16 h1:TzbbT13DaJy3TR2zae7TFy1/kLk5ht7vFU1yn+YF+bs=
+github.com/abemedia/go-webview v0.0.0-20250327021345-7b06ad397f16/go.mod h1:MUm5qeBfgr9qtrAHbpCbdQwx6wiQRih+dQpzkpqzzFY=
+github.com/ebitengine/purego v0.8.2 h1:jPPGWs2sZ1UgOSgD2bClL0MJIqu58nOmIcBuXr62z1I=
+github.com/ebitengine/purego v0.8.2/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+golang.org/x/text v0.32.0 h1:ZD01bjUt1FQ9WJ0ClOL5vxgxOI/sVCNgX1YtKwcY0mU=
+golang.org/x/text v0.32.0/go.mod h1:o/rUWzghvpD5TXrTIBuJU77MTaN0ljMWE47kxGJQ7jY=
